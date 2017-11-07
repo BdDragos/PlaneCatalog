@@ -5,6 +5,7 @@ package com.mobilelab.artyomska.planecatalog.model;
  */
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import org.jetbrains.annotations.NotNull;
@@ -86,6 +87,7 @@ public class Plane
         this.planeYear = planeYear;
     }
 
+    @Ignore
     public Plane(@NotNull int ID, String planeName, String planeEngine, String planeProducer, String planeCountry, int planeYear) {
         this.ID = ID;
         this.planeName = planeName;
@@ -95,6 +97,7 @@ public class Plane
         this.planeYear = planeYear;
     }
 
+    @Ignore
     public Plane(String planeName, String planeEngine, String planeProducer, String planeCountry, int planeYear) {
         this.planeName = planeName;
         this.planeEngine = planeEngine;
@@ -103,6 +106,7 @@ public class Plane
         this.planeYear = planeYear;
     }
 
+    @Ignore
     public Plane(String planeName, String planeEngine, String planeProducer, String planeCountry, int planeYear,String wikiLink) {
         this.planeName = planeName;
         this.planeEngine = planeEngine;

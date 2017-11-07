@@ -27,8 +27,9 @@ public class MainController
         return repo.getAllPlanes();
     }
 
-    public boolean addNewPlane(Plane plane)
+    public boolean addNewPlane(String name, String engine, String producer, String country, int year, String wiki)
     {
+        Plane plane = new Plane(name,engine,producer,country,year,wiki);
         return repo.insertPlane(plane);
     }
 
@@ -41,4 +42,5 @@ public class MainController
     {
         repo.deletePlane(plane.getPlaneName());
     }
+
 }

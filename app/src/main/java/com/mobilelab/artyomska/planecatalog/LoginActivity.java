@@ -31,11 +31,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        name = (EditText)findViewById(R.id.userInput);
-        password = (EditText)findViewById(R.id.passwordInput);
-        loginButton = (Button)findViewById(R.id.loginButton);
-        attemptsText = (TextView)findViewById(R.id.attemptsText);
-        registerButton = (Button)findViewById(R.id.registerBut);
+        name = findViewById(R.id.userInput);
+        password = findViewById(R.id.passwordInput);
+        loginButton = findViewById(R.id.loginButton);
+        attemptsText = findViewById(R.id.attemptsText);
+        registerButton = findViewById(R.id.registerBut);
 
         attemptsText.setText("No of attempts remaining: 5");
         loginButton.setOnClickListener(new View.OnClickListener() {
@@ -76,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         else
         {
-
             AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
             alertDialog.setTitle("Alert");
             alertDialog.setMessage("Wrong username or password");

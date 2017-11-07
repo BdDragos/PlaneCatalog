@@ -1,6 +1,7 @@
 package com.mobilelab.artyomska.planecatalog.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +43,7 @@ public class User
         this.ID = ID;
     }
 
+    @Ignore
     public User(String username, String password) {
         this.username = username;
         this.password = password;
