@@ -9,6 +9,7 @@ import android.arch.persistence.room.Update;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**

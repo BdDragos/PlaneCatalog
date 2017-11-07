@@ -8,6 +8,7 @@ import android.arch.persistence.room.Update;
 
 import com.mobilelab.artyomska.planecatalog.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,9 +20,6 @@ public interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     long addUser(User user);
-
-    @Query("select * from user")
-    List<User> getAllUser();
 
     @Query("select * from user where username = :username")
     User getUserByName(String username);

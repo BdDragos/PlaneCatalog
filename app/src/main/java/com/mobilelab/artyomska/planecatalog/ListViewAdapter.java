@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class ListViewAdapter extends ArrayAdapter<Plane> implements View.OnClickListener{
 
     private ArrayList<Plane> dataSet;
-    Context mContext;
+    private Context mContext;
 
     // View lookup cache
     private static class ViewHolder {
@@ -55,30 +55,25 @@ public class ListViewAdapter extends ArrayAdapter<Plane> implements View.OnClick
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // Get the data item for this position
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
         Plane dataModel = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
-
-        final View result;
 
         if (convertView == null) {
 
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.listview_row, parent, false);
-            viewHolder.txtName = (TextView) convertView.findViewById(R.id.planeName);
-            viewHolder.txtProducer = (TextView) convertView.findViewById(R.id.planeProducer);
-            viewHolder.txtCountry = (TextView) convertView.findViewById(R.id.planeCountry);
-            viewHolder.info = (ImageView) convertView.findViewById(R.id.item_info);
+            viewHolder.txtName = convertView.findViewById(R.id.planeName);
+            viewHolder.txtProducer = convertView.findViewById(R.id.planeProducer);
+            viewHolder.txtCountry = convertView.findViewById(R.id.planeCountry);
+            viewHolder.info = convertView.findViewById(R.id.item_info);
 
-            result=convertView;
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
-            result=convertView;
         }
 
         viewHolder.txtName.setText(dataModel.getPlaneName());

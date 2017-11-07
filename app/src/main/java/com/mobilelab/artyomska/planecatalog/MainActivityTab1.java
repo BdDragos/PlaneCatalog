@@ -9,9 +9,12 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.mobilelab.artyomska.planecatalog.controller.MainController;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
+import com.mobilelab.artyomska.planecatalog.repository.PlaneRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Artyomska on 11/6/2017.
@@ -19,24 +22,22 @@ import java.util.ArrayList;
 
 public class MainActivityTab1 extends Fragment {
 
-    ArrayList<Plane> dataModels;
+    private List<Plane> dataModels;
     private ListView planeList;
-    private static ListViewAdapter adapter;
+    private ListViewAdapter adapter;
+    private MainController controller;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View RootView = inflater.inflate(R.layout.tab1, container, false);
 
-        planeList = (ListView)RootView.findViewById(R.id.planeList);
+        planeList = RootView.findViewById(R.id.planeList);
+        controller = new MainController(getActivity());
+        dataModels = controller.gettAllPlane();
 
-        dataModels = new ArrayList<>();
-        dataModels.add(new Plane("FW-190","BMW","Focke-Wulf","Germany",1941));
-        dataModels.add(new Plane("BF-109","Daimler","Messerschmit","Germany",1939));
-        dataModels.add(new Plane("Spitfire","Rolls-Royce","Supermarine","UK",1941));
-        dataModels.add(new Plane("P-51","Packard","North-American","USA",1941));
-
-        adapter= new ListViewAdapter(dataModels,getActivity());
+        ArrayList<Plane> tmp = new ArrayList<>(dataModels);
+        adapter= new ListViewAdapter(tmp,getActivity());
 
         planeList.setAdapter(adapter);
 
