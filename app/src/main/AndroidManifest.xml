@@ -30,15 +30,18 @@
             android:label="Register">
             >
         </activity>
-        <activity android:name=".InsertActivity" android:label="Insert"></activity>
+        <activity
+            android:name=".InsertActivity"
+            android:label="Insert" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDnQSIyXp0WqxCOdbqECaS9vAOWyNgnLFo"/>
+            android:value="AIzaSyDnQSIyXp0WqxCOdbqECaS9vAOWyNgnLFo" />
+
+        <activity android:name=".UpdateActivity"></activity>
     </application>
 
 </manifest>

@@ -88,13 +88,14 @@ public class Plane
     }
 
     @Ignore
-    public Plane(@NotNull int ID, String planeName, String planeEngine, String planeProducer, String planeCountry, int planeYear) {
+    public Plane(@NotNull int ID, String planeName, String planeEngine, String planeProducer, String planeCountry, int planeYear,String wikiLink) {
         this.ID = ID;
         this.planeName = planeName;
         this.planeEngine = planeEngine;
         this.planeProducer = planeProducer;
         this.planeCountry = planeCountry;
         this.planeYear = planeYear;
+        this.wikiLink = wikiLink;
     }
 
     @Ignore

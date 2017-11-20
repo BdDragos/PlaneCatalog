@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                 1);
 
+        /*
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+        */
 
     }
 

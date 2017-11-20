@@ -19,7 +19,7 @@ import java.util.List;
 @Dao
 public interface PlaneDao {
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert
     long addPlane(Plane plane);
 
     @Query("select * from plane")
@@ -40,7 +40,7 @@ public interface PlaneDao {
     @Query("select * from plane where planeYear = :planeYear")
     Plane getPlaneByYear(int planeYear);
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
+    @Update
     void updatePlane(Plane plane);
 
     @Query("delete from plane")

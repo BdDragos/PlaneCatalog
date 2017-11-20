@@ -1,30 +1,29 @@
 package com.mobilelab.artyomska.planecatalog;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.service.MainService;
 
 import java.util.ArrayList;
 
-/**
- * Created by Artyomska on 11/7/2017.
- */
-
 public class ListViewAdapter extends ArrayAdapter<Plane> implements View.OnClickListener{
 
-    private ArrayList<Plane> dataSet;
     private Context mContext;
     private MainService service;
 
-    // View lookup cache
     private static class ViewHolder {
         TextView txtName;
         TextView txtProducer;
@@ -32,9 +31,9 @@ public class ListViewAdapter extends ArrayAdapter<Plane> implements View.OnClick
         ImageView info;
     }
 
-    public ListViewAdapter(ArrayList<Plane> data, Context context,MainService service) {
+    public ListViewAdapter(ArrayList<Plane> data, Context context,MainService service)
+    {
         super(context, R.layout.listview_row, data);
-        this.dataSet = data;
         this.mContext = context;
         this.service = service;
 
@@ -45,30 +44,52 @@ public class ListViewAdapter extends ArrayAdapter<Plane> implements View.OnClick
 
         int position=(Integer) v.getTag();
         Object object= getItem(position);
-        final Plane dataModel=(Plane)object;
+        final Plane plane=(Plane)object;
 
-
-        switch (v.getId())
-        {
+        switch (v.getId()) {
             case R.id.item_info:
-                Snackbar snack = Snackbar.make(v, "Plane Year " +dataModel.getPlaneYear(), Snackbar.LENGTH_LONG)
-                        .setDuration(4000)
-                        .setAction("DELETE", new View.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(View view)
-                            {
-                                Snackbar snackbar1 = Snackbar.make(v, "Element was deleted", Snackbar.LENGTH_SHORT);
-                                service.deletePlane(dataModel.getPlaneName());
-                                remove(dataModel);
+
+                PopupMenu popup = new PopupMenu(mContext, v);
+                popup.getMenuInflater().inflate(R.menu.clipboard_popup,popup.getMenu());
+                popup.show();
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        switch (item.getItemId()) {
+                            case R.id.updatePlane:
+
+                                Intent intent = new Intent(mContext, UpdateActivity.class);
+
+                                Gson gson = new Gson();
+                                String planeAsString = gson.toJson(plane);
+                                intent.putExtra("PlaneString", planeAsString);
+                                ((Activity) mContext).startActivityForResult(intent, 1);
+                                break;
+
+                            case R.id.deletePlane:
+
+                                Snackbar snackbar1 = Snackbar.make(v, "Element was deleted", Snackbar.LENGTH_SHORT).setDuration(2000);
+                                service.deletePlane(plane.getPlaneName());
+                                remove(plane);
                                 notifyDataSetChanged();
                                 snackbar1.show();
-                            }
-                        });
-                snack.show();
+                                break;
+
+                            default:
+
+                                break;
+                        }
+
+                        return true;
+                    }
+                });
+
+                break;
+
+            default:
                 break;
         }
-
     }
 
     @Override

@@ -75,4 +75,13 @@ public class MainActivityTab1 extends Fragment {
         }
     }
 
+    public static void updateListViewAfterUpdate(Plane oldPlane,Plane newPlane)
+    {
+        if(adapter != null)
+        {
+            tmp.remove(oldPlane);
+            tmp.add(newPlane);
+            adapter.notifyDataSetChanged();
+        }
+    }
 }

@@ -31,9 +31,9 @@ public class MainService
         return repo.insertPlane(plane);
     }
 
-    public void updatePlane(Plane plane)
+    public boolean updatePlane(Plane plane)
     {
-        repo.updatePlane(plane);
+        return repo.updatePlane(plane);
     }
 
     public void deletePlane(String planeName)

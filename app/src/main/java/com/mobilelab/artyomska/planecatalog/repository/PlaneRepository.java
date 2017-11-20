@@ -44,8 +44,12 @@ public class PlaneRepository
         db.planeDao().removeAPlane(planeName);
     }
 
-    public void updatePlane(Plane plane)
+    public boolean updatePlane(Plane plane)
     {
+        Plane foundPlane = db.planeDao().getPlaneByName(plane.getPlaneName());
+        if (foundPlane != null)
+            return false;
         db.planeDao().updatePlane(plane);
+        return true;
     }
 }
