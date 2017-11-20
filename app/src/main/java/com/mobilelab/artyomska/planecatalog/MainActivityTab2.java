@@ -7,11 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import com.mobilelab.artyomska.planecatalog.controller.LoginController;
-import com.mobilelab.artyomska.planecatalog.controller.MainController;
 
 /**
  * Created by Artyomska on 11/6/2017.

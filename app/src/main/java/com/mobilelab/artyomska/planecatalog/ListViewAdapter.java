@@ -1,6 +1,7 @@
 package com.mobilelab.artyomska.planecatalog;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.mobilelab.artyomska.planecatalog.model.Plane;
+import com.mobilelab.artyomska.planecatalog.service.MainService;
 
 import java.util.ArrayList;
 
@@ -20,6 +22,7 @@ public class ListViewAdapter extends ArrayAdapter<Plane> implements View.OnClick
 
     private ArrayList<Plane> dataSet;
     private Context mContext;
+    private MainService service;
 
     // View lookup cache
     private static class ViewHolder {
@@ -29,29 +32,43 @@ public class ListViewAdapter extends ArrayAdapter<Plane> implements View.OnClick
         ImageView info;
     }
 
-    public ListViewAdapter(ArrayList<Plane> data, Context context) {
+    public ListViewAdapter(ArrayList<Plane> data, Context context,MainService service) {
         super(context, R.layout.listview_row, data);
         this.dataSet = data;
-        this.mContext=context;
+        this.mContext = context;
+        this.service = service;
 
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
 
         int position=(Integer) v.getTag();
         Object object= getItem(position);
-        Plane dataModel=(Plane)object;
+        final Plane dataModel=(Plane)object;
 
-        /*
+
         switch (v.getId())
         {
             case R.id.item_info:
-                Snackbar.make(v, "Release date " +dataModel.getFeature(), Snackbar.LENGTH_LONG)
-                        .setAction("No action", null).show();
+                Snackbar snack = Snackbar.make(v, "Plane Year " +dataModel.getPlaneYear(), Snackbar.LENGTH_LONG)
+                        .setDuration(4000)
+                        .setAction("DELETE", new View.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(View view)
+                            {
+                                Snackbar snackbar1 = Snackbar.make(v, "Element was deleted", Snackbar.LENGTH_SHORT);
+                                service.deletePlane(dataModel.getPlaneName());
+                                remove(dataModel);
+                                notifyDataSetChanged();
+                                snackbar1.show();
+                            }
+                        });
+                snack.show();
                 break;
         }
-        */
+
     }
 
     @Override

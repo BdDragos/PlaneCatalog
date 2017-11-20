@@ -1,23 +1,21 @@
-package com.mobilelab.artyomska.planecatalog.controller;
+package com.mobilelab.artyomska.planecatalog.service;
 
 import android.content.Context;
 
 import com.mobilelab.artyomska.planecatalog.model.Plane;
-import com.mobilelab.artyomska.planecatalog.repository.LoginRepository;
 import com.mobilelab.artyomska.planecatalog.repository.PlaneRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Artyomska on 11/6/2017.
  */
 
-public class MainController
+public class MainService
 {
     PlaneRepository repo;
 
-    public MainController(Context dbContext)
+    public MainService(Context dbContext)
     {
         this.repo = new PlaneRepository(dbContext);
     }
@@ -38,9 +36,9 @@ public class MainController
         repo.updatePlane(plane);
     }
 
-    public void deletePlane(Plane plane)
+    public void deletePlane(String planeName)
     {
-        repo.deletePlane(plane.getPlaneName());
+        repo.deletePlane(planeName);
     }
 
 }

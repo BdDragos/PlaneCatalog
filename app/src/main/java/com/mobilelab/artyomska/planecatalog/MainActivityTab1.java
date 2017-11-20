@@ -7,11 +7,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
-import com.mobilelab.artyomska.planecatalog.controller.MainController;
+import com.mobilelab.artyomska.planecatalog.service.MainService;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +27,9 @@ public class MainActivityTab1 extends Fragment {
 
     private List<Plane> dataModels;
     private ListView planeList;
-    private ListViewAdapter adapter;
-    private MainController controller;
+    private static ListViewAdapter adapter;
+    private static MainService service;
+    private static ArrayList<Plane> tmp;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -34,17 +37,18 @@ public class MainActivityTab1 extends Fragment {
         View RootView = inflater.inflate(R.layout.tab1, container, false);
 
         planeList = RootView.findViewById(R.id.planeList);
-        controller = new MainController(getActivity());
-        dataModels = controller.gettAllPlane();
+        service = new MainService(getActivity());
+        dataModels = service.gettAllPlane();
 
-        ArrayList<Plane> tmp = new ArrayList<>(dataModels);
-        adapter= new ListViewAdapter(tmp,getActivity());
+        tmp = new ArrayList<>(dataModels);
+        adapter= new ListViewAdapter(tmp,getActivity(),service);
 
         planeList.setAdapter(adapter);
 
         return RootView;
     }
 
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
@@ -52,10 +56,10 @@ public class MainActivityTab1 extends Fragment {
                 String stredittext = data.getStringExtra("id");
                 if (stredittext.equals("value"))
                 {
-                    dataModels = controller.gettAllPlane();
+                    dataModels = service.gettAllPlane();
 
                     ArrayList<Plane> tmp = new ArrayList<>(dataModels);
-                    adapter= new ListViewAdapter(tmp,getActivity());
+                    adapter= new ListViewAdapter(tmp,getActivity(),service);
 
                     planeList.setAdapter(adapter);
                 }
@@ -63,9 +67,12 @@ public class MainActivityTab1 extends Fragment {
         }
     }
 
-    public void updateFragment1ListView(){
-        if(adapter != null){
+    public static void updateFragment1ListView(Plane plane){
+        if(adapter != null)
+        {
+            tmp.add(plane);
             adapter.notifyDataSetChanged();
         }
     }
+
 }

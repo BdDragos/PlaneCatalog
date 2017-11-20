@@ -10,10 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.mobilelab.artyomska.planecatalog.controller.LoginController;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
-import com.mobilelab.artyomska.planecatalog.model.User;
 import com.mobilelab.artyomska.planecatalog.repository.PlaneRepository;
+import com.mobilelab.artyomska.planecatalog.service.LoginService;
+import com.mobilelab.artyomska.planecatalog.model.User;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -23,7 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button registerButton;
     private TextView attemptsText;
     private int counter = 5;
-    private LoginController controller;
+    private LoginService controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -54,16 +54,16 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        /*
+
         PlaneRepository repo = new PlaneRepository(getApplicationContext());
         repo.insertPlane(new Plane("BF-109","Daimler","Messerschmit","Germany",1939));
         repo.insertPlane(new Plane("Spitfire","Rolls-Royce","Supermarine","UK",1940));
         repo.insertPlane(new Plane("P-51","Packard","North-American","USA",1942));
         repo.insertPlane(new Plane("LA-7","Klimov","Lavochkin","USSR",1943));
         repo.insertPlane(new Plane("A6M2","Mitsubishi","Mitsubishi","Japan",1941));
-        */
 
-        controller = new LoginController(getApplicationContext());
+
+        controller = new LoginService(getApplicationContext());
     }
 
     private void validate(String userName, String userPassword)

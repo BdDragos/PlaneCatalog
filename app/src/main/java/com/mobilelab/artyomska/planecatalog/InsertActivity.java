@@ -1,7 +1,5 @@
 package com.mobilelab.artyomska.planecatalog;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -11,8 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.mobilelab.artyomska.planecatalog.controller.LoginController;
-import com.mobilelab.artyomska.planecatalog.controller.MainController;
+import com.mobilelab.artyomska.planecatalog.model.Plane;
+import com.mobilelab.artyomska.planecatalog.service.MainService;
 
 public class InsertActivity extends AppCompatActivity {
 
@@ -24,7 +22,7 @@ public class InsertActivity extends AppCompatActivity {
     private EditText textCountry;
     private EditText textYear;
     private EditText textWiki;
-    private MainController controller;
+    private MainService controller;
     private MainActivityTab1 frag1;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -58,7 +56,7 @@ public class InsertActivity extends AppCompatActivity {
             }
         });
 
-        controller = new MainController(getApplicationContext());
+        controller = new MainService(getApplicationContext());
     }
 
     private void insertion(String name, String engine, String producer, String country, String year, String wiki)
@@ -96,6 +94,7 @@ public class InsertActivity extends AppCompatActivity {
                 alertDialog.show();
             }
 
+            Plane newPlane = new Plane(name,engine,producer,country,Integer.parseInt(year),wiki);
             boolean isInserted = controller.addNewPlane(name,engine,producer,country,Integer.parseInt(year),wiki);
             if (!isInserted)
             {
@@ -127,6 +126,7 @@ public class InsertActivity extends AppCompatActivity {
                             }
                         });
                 alertDialog.show();
+                MainActivityTab1.updateFragment1ListView(newPlane);
             }
         }
     }

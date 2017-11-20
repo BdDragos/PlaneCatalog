@@ -1,4 +1,4 @@
-package com.mobilelab.artyomska.planecatalog.controller;
+package com.mobilelab.artyomska.planecatalog.service;
 
 import android.content.Context;
 
@@ -9,11 +9,11 @@ import com.mobilelab.artyomska.planecatalog.repository.LoginRepository;
  * Created by Artyomska on 10/16/2017.
  */
 
-public class LoginController
+public class LoginService
 {
     LoginRepository repo;
 
-    public LoginController(Context dbContext)
+    public LoginService(Context dbContext)
     {
         this.repo = new LoginRepository(dbContext);
     }
