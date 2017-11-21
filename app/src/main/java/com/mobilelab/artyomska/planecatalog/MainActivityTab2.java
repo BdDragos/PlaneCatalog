@@ -19,17 +19,6 @@ public class MainActivityTab2 extends Fragment {
     {
         View RootView = inflater.inflate(R.layout.tab2, container, false);
 
-        Button insertButton = RootView.findViewById(R.id.insertNewPlane);
-
-        insertButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View RootView)
-            {
-                Intent intent = new Intent(getActivity(), InsertActivity.class);
-                startActivityForResult(intent,1);
-            }
-        });
-
         return RootView;
     }
 

@@ -5,31 +5,12 @@
     android:orientation="vertical">
 
     <Button
-        android:id="@+id/insertNewPlane"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="27dp"
-        android:text="Insert a new plane" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/insertNewPlane"
-        android:layout_below="@+id/insertNewPlane"
-        android:layout_marginTop="17dp"
-        android:text="Modify an existing plane" />
-
-    <Button
         android:id="@+id/button4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/button2"
-        android:layout_below="@+id/button2"
-        android:layout_marginTop="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="34dp"
         android:text="Sync local database with the server" />
 
 </RelativeLayout>

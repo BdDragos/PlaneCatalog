@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.service.MainService;
 import com.mobilelab.artyomska.planecatalog.utils.CheckInteger;
@@ -24,7 +25,8 @@ public class InsertActivity extends AppCompatActivity {
     private EditText textYear;
     private EditText textWiki;
     private MainService controller;
-    private MainActivityTab1 frag1;
+    private Plane newPlane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -93,7 +95,7 @@ public class InsertActivity extends AppCompatActivity {
                         });
                 alertDialog.show();
             } else {
-                Plane newPlane = new Plane(name, engine, producer, country, Integer.parseInt(year), wiki);
+                this.newPlane = new Plane(name, engine, producer, country, Integer.parseInt(year), wiki);
                 boolean isInserted = controller.addNewPlane(name, engine, producer, country, Integer.parseInt(year), wiki);
                 if (!isInserted) {
                     AlertDialog alertDialog = new AlertDialog.Builder(InsertActivity.this).create();
@@ -113,16 +115,10 @@ public class InsertActivity extends AppCompatActivity {
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-
-                                    Intent intent = new Intent();
-                                    intent.putExtra("id", "value");
-                                    setResult(RESULT_OK, intent);
-                                    dialog.dismiss();
                                     finish();
                                 }
                             });
                     alertDialog.show();
-                    MainActivityTab1.updateFragment1ListView(newPlane);
                 }
             }
         }

@@ -4,31 +4,28 @@ package com.mobilelab.artyomska.planecatalog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ListView;
 
+import com.google.gson.Gson;
 import com.mobilelab.artyomska.planecatalog.service.MainService;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
+import com.mobilelab.artyomska.planecatalog.utils.MyParcelable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-/**
- * Created by Artyomska on 11/6/2017.
- */
 
 public class MainActivityTab1 extends Fragment {
 
-    private List<Plane> dataModels;
-    private ListView planeList;
-    private static ListViewAdapter adapter;
-    private static MainService service;
+    private MainService service;
+    private RecyclerView planeList;
+    private PlaneAdapter adapter;
     private static ArrayList<Plane> tmp;
 
     @Override
@@ -36,52 +33,28 @@ public class MainActivityTab1 extends Fragment {
     {
         View RootView = inflater.inflate(R.layout.tab1, container, false);
 
-        planeList = RootView.findViewById(R.id.planeList);
         service = new MainService(getActivity());
-        dataModels = service.gettAllPlane();
+        List<Plane> dataModels = service.gettAllPlane();
 
         tmp = new ArrayList<>(dataModels);
-        adapter= new ListViewAdapter(tmp,getActivity(),service);
 
+        adapter = new PlaneAdapter(getActivity(), R.layout.listview_row, tmp, service);
+        planeList = RootView.findViewById(R.id.planeList);
+
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+
+        planeList.setLayoutManager(llm);
         planeList.setAdapter(adapter);
+
 
         return RootView;
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                String stredittext = data.getStringExtra("id");
-                if (stredittext.equals("value"))
-                {
-                    dataModels = service.gettAllPlane();
-
-                    ArrayList<Plane> tmp = new ArrayList<>(dataModels);
-                    adapter= new ListViewAdapter(tmp,getActivity(),service);
-
-                    planeList.setAdapter(adapter);
-                }
-            }
-        }
-    }
-
-    public static void updateFragment1ListView(Plane plane){
-        if(adapter != null)
-        {
-            tmp.add(plane);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    public static void updateListViewAfterUpdate(Plane oldPlane,Plane newPlane)
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if(adapter != null)
-        {
-            tmp.remove(oldPlane);
-            tmp.add(newPlane);
-            adapter.notifyDataSetChanged();
-        }
+
     }
+
 }

@@ -26,8 +26,8 @@ public class UpdateActivity extends AppCompatActivity {
     private EditText textYear;
     private EditText textWiki;
     private MainService controller;
-    private MainActivityTab1 frag1;
     private Plane oldPlane;
+    private Plane newPlane;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -38,6 +38,7 @@ public class UpdateActivity extends AppCompatActivity {
 
         Gson gson = new Gson();
         String planeAsString = getIntent().getStringExtra("PlaneString");
+        String planeAdapter = getIntent().getStringExtra("Adapter");
         oldPlane = gson.fromJson(planeAsString, Plane.class);
 
         textName = findViewById(R.id.textName);
@@ -111,7 +112,7 @@ public class UpdateActivity extends AppCompatActivity {
             }
             else
             {
-                Plane newPlane = new Plane(oldPlane.getID(),name, engine, producer, country, Integer.parseInt(year), wiki);
+                this.newPlane = new Plane(oldPlane.getID(),name, engine, producer, country, Integer.parseInt(year), wiki);
                 boolean isUpdated = controller.updatePlane(newPlane);
                 if (!isUpdated) {
                     AlertDialog alertDialog = new AlertDialog.Builder(UpdateActivity.this).create();
@@ -131,18 +132,13 @@ public class UpdateActivity extends AppCompatActivity {
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-
-                                    Intent intent = new Intent();
-                                    intent.putExtra("id", "value");
-                                    setResult(RESULT_OK, intent);
-                                    dialog.dismiss();
                                     finish();
                                 }
                             });
                     alertDialog.show();
-                    MainActivityTab1.updateListViewAfterUpdate(oldPlane,newPlane);
                 }
             }
         }
     }
+
 }

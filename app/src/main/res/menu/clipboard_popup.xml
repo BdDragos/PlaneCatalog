@@ -6,4 +6,8 @@
     <item
         android:id="@+id/deletePlane"
         android:title="Delete" />
+
+    <item
+        android:id="@+id/insertPlane"
+        android:title="Insert" />
 </menu>
