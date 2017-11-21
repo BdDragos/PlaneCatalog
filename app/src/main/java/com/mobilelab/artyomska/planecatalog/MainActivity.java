@@ -1,6 +1,7 @@
 package com.mobilelab.artyomska.planecatalog;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -23,11 +24,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.mobilelab.artyomska.planecatalog.model.Plane;
+import com.mobilelab.artyomska.planecatalog.service.MainService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
+    private PlaneAdapter adapter;
+    private MainService service;
     private ViewPager mViewPager;
 
     @Override
@@ -56,6 +64,14 @@ public class MainActivity extends AppCompatActivity {
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                 1);
 
+        Context context = MainActivity.this;
+        this.service = new MainService(context);
+        List<Plane> dataModels = this.service.gettAllPlane();
+
+        ArrayList<Plane> tmp = new ArrayList<>(dataModels);
+
+        this.adapter = new PlaneAdapter(context, R.layout.listview_row, tmp, service);
+
         /*
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +90,31 @@ public class MainActivity extends AppCompatActivity {
 
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    public MainService getService()
+    {
+        return this.service;
+    }
+
+    public PlaneAdapter getAdapter()
+    {
+        return this.adapter;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                String stredittext = data.getStringExtra("rez");
+                if (stredittext.equals("1"))
+                {
+                    adapter.onIorUItem();
+                }
+            }
+        }
     }
 
     @Override
@@ -98,8 +139,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public Fragment getItem(int position) {
-            switch (position) {
+        public Fragment getItem(int position)
+        {
+            switch (position)
+            {
                 case 0:
                     MainActivityTab1 tab1 = new MainActivityTab1();
                     return tab1;

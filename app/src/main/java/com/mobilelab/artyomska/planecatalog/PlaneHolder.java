@@ -75,11 +75,7 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
                                 Gson gson = new Gson();
                                 String planeAsString = gson.toJson(plane);
                                 intent1.putExtra("PlaneString", planeAsString);
-                                context.startActivity(intent1);
-
-                                Snackbar snackbar1 = Snackbar.make(v, "Element was updated", Snackbar.LENGTH_SHORT).setDuration(2000);
-                                adapter.onIorUItem();
-                                snackbar1.show();
+                                ((Activity) context).startActivityForResult(intent1, 1);
 
                                 break;
 
@@ -94,11 +90,7 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
                             case R.id.insertPlane:
 
                                 Intent intent2 = new Intent(context, InsertActivity.class);
-                                context.startActivity(intent2);
-
-                                Snackbar snackbar3 = Snackbar.make(v, "Element was inserted", Snackbar.LENGTH_SHORT).setDuration(2000);
-                                adapter.onIorUItem();
-                                snackbar3.show();
+                                ((Activity) context).startActivityForResult(intent2, 1);
 
                                 break;
 
