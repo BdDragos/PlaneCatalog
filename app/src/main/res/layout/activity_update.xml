@@ -124,7 +124,7 @@
         android:id="@+id/buttonUpdatePlane"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Update"
+        android:text="@string/update"
         app:layout_constraintBaseline_toBaselineOf="@+id/buttonClearPlane"
         app:layout_constraintEnd_toEndOf="@+id/textWiki" />
 
@@ -134,7 +134,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="19dp"
         android:layout_marginTop="32dp"
-        android:text="Clear the fields"
+        android:text="@string/clear_the_fields"
         app:layout_constraintEnd_toStartOf="@+id/buttonUpdatePlane"
         app:layout_constraintTop_toBottomOf="@+id/textWiki" />
 

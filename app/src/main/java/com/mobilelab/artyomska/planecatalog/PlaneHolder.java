@@ -1,8 +1,10 @@
 package com.mobilelab.artyomska.planecatalog;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -14,6 +16,9 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.service.MainService;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -91,6 +96,21 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
 
                                 Intent intent2 = new Intent(context, InsertActivity.class);
                                 ((Activity) context).startActivityForResult(intent2, 1);
+
+                                break;
+
+                            case R.id.openWiki:
+
+                                String query = null;
+                                try {
+                                    query = URLEncoder.encode(plane.getPlaneName(), "utf-8");
+                                } catch (UnsupportedEncodingException e) {
+                                    e.printStackTrace();
+                                }
+                                String url = "http://www.google.com/search?q=" + query;
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setData(Uri.parse(url));
+                                context.startActivity(intent);
 
                                 break;
 

@@ -50,6 +50,4 @@ public class MainActivityTab1 extends Fragment {
         return RootView;
     }
 
-
-
 }

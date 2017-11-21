@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="40dp"
-        android:text="Plane Name"
+        android:text="@string/plane_name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -124,7 +124,7 @@
         android:id="@+id/buttonUpdatePlane"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Insert"
+        android:text="@string/insert"
         app:layout_constraintBaseline_toBaselineOf="@+id/buttonClearPlane"
         app:layout_constraintEnd_toEndOf="@+id/textWiki" />
 
@@ -134,7 +134,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="11dp"
         android:layout_marginTop="19dp"
-        android:text="Clear the fields"
+        android:text="@string/clear_the_fields"
         app:layout_constraintEnd_toStartOf="@+id/buttonUpdatePlane"
         app:layout_constraintTop_toBottomOf="@+id/textWiki" />
 </android.support.constraint.ConstraintLayout>

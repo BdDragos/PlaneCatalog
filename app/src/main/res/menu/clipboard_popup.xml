@@ -2,12 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
         android:id="@+id/updatePlane"
-        android:title="Update" />
+        android:title="@string/update" />
     <item
         android:id="@+id/deletePlane"
-        android:title="Delete" />
+        android:title="@string/delete" />
 
     <item
         android:id="@+id/insertPlane"
-        android:title="Insert" />
+        android:title="@string/insert" />
+    <item
+        android:id="@+id/openWiki"
+        android:title="More" />
 </menu>
