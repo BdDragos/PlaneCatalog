@@ -1,19 +1,30 @@
 package com.mobilelab.artyomska.planecatalog;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.service.MainService;
 import com.mobilelab.artyomska.planecatalog.utils.CheckInteger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class UpdateActivity extends AppCompatActivity {
 
@@ -38,7 +49,6 @@ public class UpdateActivity extends AppCompatActivity {
 
         Gson gson = new Gson();
         String planeAsString = getIntent().getStringExtra("PlaneString");
-        String planeAdapter = getIntent().getStringExtra("Adapter");
         oldPlane = gson.fromJson(planeAsString, Plane.class);
 
         textName = findViewById(R.id.textName);
@@ -113,11 +123,29 @@ public class UpdateActivity extends AppCompatActivity {
             else
             {
                 this.newPlane = new Plane(oldPlane.getID(),name, engine, producer, country, Integer.parseInt(year), wiki);
-                boolean isUpdated = controller.updatePlane(newPlane);
-                if (!isUpdated) {
+                deletePlane(newPlane);
+            }
+        }
+    }
+
+
+    public void deletePlane(final Plane plane)
+    {
+        final ProgressDialog pDialog = new ProgressDialog(UpdateActivity.this);
+        pDialog.setMessage("Loading...");
+        pDialog.show();
+
+        String tag_json_obj = "json_obj_req";
+        String url = "http://DESKTOP-28CNHAN//InventoryManagement/api/plane/UpdatePlane";
+        StringRequest strReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response)
+            {
+                if (response.compareTo("true") != 0)
+                {
                     AlertDialog alertDialog = new AlertDialog.Builder(UpdateActivity.this).create();
                     alertDialog.setTitle("Error");
-                    alertDialog.setMessage("Plane couldn't be updated. Username already exists.");
+                    alertDialog.setMessage("Plane couldn't be updated. Plane name already exists.");
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -125,25 +153,58 @@ public class UpdateActivity extends AppCompatActivity {
                                 }
                             });
                     alertDialog.show();
-                } else {
+                }
+                else
+                {
                     AlertDialog alertDialog = new AlertDialog.Builder(UpdateActivity.this).create();
                     alertDialog.setTitle("Success");
                     alertDialog.setMessage("The plane was updated");
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-
                                     Intent intent = new Intent();
                                     intent.putExtra("rez", "1");
                                     setResult(RESULT_OK, intent);
-                                    dialog.dismiss();
                                     finishActivity(1);
-                                    return;
+                                    dialog.dismiss();
                                 }
                             });
                     alertDialog.show();
                 }
             }
-        }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error)
+            {
+                Log.e("ERROR", "Error occurred ", error);
+                pDialog.hide();
+            }
+        })
+        {
+            @Override
+            protected Map<String,String> getParams()
+            {
+                Map<String, String> params = new HashMap<>();
+                params.put("ID",Integer.toString(plane.getID()));
+                params.put("planeName", plane.getPlaneName());
+                params.put("planeEngine", plane.getPlaneEngine());
+                params.put("planeProducer", plane.getPlaneCountry());
+                params.put("planeCountry", plane.getPlaneProducer());
+                params.put("planeYear", Integer.toString(plane.getPlaneYear()));
+                params.put("wikiLink", plane.getWikiLink());
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+
+        };
+        AppController.getInstance().addToRequestQueue(strReq, tag_json_obj);
     }
 }

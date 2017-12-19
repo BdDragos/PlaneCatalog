@@ -25,9 +25,8 @@ public class MainService
         return repo.getAllPlanes();
     }
 
-    public boolean addNewPlane(String name, String engine, String producer, String country, int year, String wiki)
+    public boolean addNewPlane(Plane plane)
     {
-        Plane plane = new Plane(name,engine,producer,country,year,wiki);
         return repo.insertPlane(plane);
     }
 
@@ -39,6 +38,11 @@ public class MainService
     public void deletePlane(String planeName)
     {
         repo.deletePlane(planeName);
+    }
+
+    public void deleteAllFromPlane()
+    {
+        repo.deleteAllPlane();
     }
 
 }

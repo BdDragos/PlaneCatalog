@@ -52,4 +52,8 @@ public class PlaneRepository
         db.planeDao().updatePlane(plane);
         return true;
     }
+
+    public void deleteAllPlane() {
+        db.planeDao().removeAllPlane();
+    }
 }
