@@ -13,12 +13,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
+import com.mobilelab.artyomska.planecatalog.model.User;
 import com.mobilelab.artyomska.planecatalog.repository.PlaneRepository;
+import com.mobilelab.artyomska.planecatalog.service.LoginService;
+import com.mobilelab.artyomska.planecatalog.utils.CheckNetwork;
 
 import org.json.JSONObject;
 
@@ -32,7 +36,9 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private Button registerButton;
     private TextView attemptsText;
-    private int counter = 5;
+    private CheckNetwork network;
+    private LoginService service;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -46,30 +52,70 @@ public class LoginActivity extends AppCompatActivity {
         registerButton = findViewById(R.id.registerBut);
 
         attemptsText.setText("No of attempts remaining: 5");
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                validate(name.getText().toString(), password.getText().toString());
-            }
-        });
+
+        network = new CheckNetwork(this);
+        service = new LoginService(this);
+
+        if (network.isNetworkConnected())
+        {
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    validate(name.getText().toString(), password.getText().toString());
+                }
+            });
+        }
+        else
+        {
+            AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+            alertDialog.setTitle("Warning");
+            alertDialog.setMessage("No internet connection. The application will change to local database");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+
+            loginButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    validateOffline(name.getText().toString(), password.getText().toString());
+                }
+            });
+        }
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 Intent intent = new Intent(getBaseContext(), RegisterActivity.class);
                 startActivity(intent);
             }
         });
 
+    }
 
-        PlaneRepository repo = new PlaneRepository(getApplicationContext());
-        repo.insertPlane(new Plane("BF-109","Daimler","Messerschmit","Germany",1939));
-        repo.insertPlane(new Plane("Spitfire","Rolls-Royce","Supermarine","UK",1940));
-        repo.insertPlane(new Plane("P-51","Packard","North-American","USA",1942));
-        repo.insertPlane(new Plane("LA-7","Klimov","Lavochkin","USSR",1943));
-        repo.insertPlane(new Plane("A6M2","Mitsubishi","Mitsubishi","Japan",1941));
-
+    private void validateOffline(String userName, String userPassword)
+    {
+        if (service.authenticateUser(new User(userName,userPassword)))
+        {
+            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        else
+        {
+            AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+            alertDialog.setTitle("Can't login");
+            alertDialog.setMessage("Invalid username or password");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
     }
 
     private void validate(final String userName,final String userPassword)
@@ -79,20 +125,21 @@ public class LoginActivity extends AppCompatActivity {
         pDialog.show();
 
         String tag_json_obj = "json_obj_req";
-        String url = "http://DESKTOP-28CNHAN//InventoryManagement/api/userdata/verify";
+        String url = "http:/DESKTOP-28CNHAN:8090/InventoryManagement/api/userdata/verify";
         StringRequest strReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
             {
                 if (response.compareTo("true") == 0)
                 {
-                    pDialog.hide();
+                    pDialog.dismiss();
                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
                     startActivity(intent);
+                    finish();
                 }
                 else
                 {
-                    pDialog.hide();
+                    pDialog.dismiss();
                     AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
                     alertDialog.setTitle("Can't login");
                     alertDialog.setMessage("Invalid username or password");
@@ -111,7 +158,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error)
             {
                 Log.e("ERROR", "Error occurred ", error);
-                pDialog.hide();
+                pDialog.dismiss();
             }
         })
         {
@@ -125,14 +172,13 @@ public class LoginActivity extends AppCompatActivity {
                 return params;
             }
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                return headers;
-            }
+
 
         };
+        strReq.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppController.getInstance().addToRequestQueue(strReq, tag_json_obj);
     }
 }

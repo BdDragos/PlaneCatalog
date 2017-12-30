@@ -14,6 +14,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.mobilelab.artyomska.planecatalog.model.User;
+import com.mobilelab.artyomska.planecatalog.service.LoginService;
+import com.mobilelab.artyomska.planecatalog.utils.CheckNetwork;
 
 import org.json.JSONObject;
 
@@ -33,31 +36,102 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        userText = (EditText)findViewById(R.id.userText);
-        passText = (EditText)findViewById(R.id.passText);
-        repeatPassText = (EditText)findViewById(R.id.repeatPassText);
-        registerBut = (Button)findViewById(R.id.registerBut);
-        clearBut = (Button)findViewById(R.id.clearBut);
+        userText = findViewById(R.id.userText);
+        passText = findViewById(R.id.passText);
+        repeatPassText = findViewById(R.id.repeatPassText);
+        registerBut = findViewById(R.id.registerBut);
+        clearBut = findViewById(R.id.clearBut);
 
-        registerBut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                register(userText.getText().toString(), passText.getText().toString(),repeatPassText.getText().toString());
-            }
-        });
+        CheckNetwork network = new CheckNetwork(this);
+
+        if (network.isNetworkConnected()) {
+            registerBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    register(userText.getText().toString(), passText.getText().toString(), repeatPassText.getText().toString());
+                }
+            });
+        }
+        else {
+            registerBut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    registerOffline(userText.getText().toString(), passText.getText().toString(), repeatPassText.getText().toString());
+                }
+            });
+        }
         clearBut.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 userText.setText("");
                 passText.setText("");
                 repeatPassText.setText("");
 
             }
         });
-
     }
+
+    private void registerOffline(String userName, String userPassword, String repeatUserPassword)
+    {
+        if (userName == null || userPassword == null || userName.length() < 4 || userPassword.length() < 4)
+        {
+            AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+            alertDialog.setTitle("Alert");
+            alertDialog.setMessage("Username or password are empty/length is less than 4");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
+        else if (userPassword.compareTo(repeatUserPassword) != 0)
+        {
+            AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+            alertDialog.setTitle("Alert");
+            alertDialog.setMessage("Passwords aren't the same.Please retype them");
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
+        else
+        {
+            LoginService service = new LoginService(this);
+            if (service.registerUser(new User(userName,userPassword)))
+            {
+                AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+                alertDialog.setTitle("Success");
+                alertDialog.setMessage("User was registered");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                alertDialog.show();
+            }
+            else
+            {
+                AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
+                alertDialog.setTitle("Can't register");
+                alertDialog.setMessage("User already exists");
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
+        }
+    }
+
 
     private void register(final String userName, final String userPassword, String repeatUserPassword)
     {
@@ -93,7 +167,7 @@ public class RegisterActivity extends AppCompatActivity {
             pDialog.setMessage("Loading...");
             pDialog.show();
 
-            String url = "http://DESKTOP-28CNHAN/InventoryManagement/api/userdata/AddUser";
+            String url = "http://DESKTOP-28CNHAN:8090/InventoryManagement/api/userdata/AddUser";
             String tag_json_obj = "json_obj_req";
 
             StringRequest strReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -102,7 +176,7 @@ public class RegisterActivity extends AppCompatActivity {
                 {
                     if (response.compareTo("true") == 0)
                     {
-                        pDialog.hide();
+                        pDialog.dismiss();
                         AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
                         alertDialog.setTitle("Success");
                         alertDialog.setMessage("User was registered");
@@ -110,13 +184,14 @@ public class RegisterActivity extends AppCompatActivity {
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         dialog.dismiss();
+                                        finish();
                                     }
                                 });
                         alertDialog.show();
                     }
                     else
                     {
-                        pDialog.hide();
+                        pDialog.dismiss();
                         AlertDialog alertDialog = new AlertDialog.Builder(RegisterActivity.this).create();
                         alertDialog.setTitle("Can't register");
                         alertDialog.setMessage("User already exists");
@@ -128,13 +203,13 @@ public class RegisterActivity extends AppCompatActivity {
                                 });
                         alertDialog.show();
                     }
-                    pDialog.hide();
+                    pDialog.dismiss();
                 }
             }, new Response.ErrorListener() {
 
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    pDialog.hide();
+                    pDialog.dismiss();
                 }
             }) {
                 @Override
@@ -145,14 +220,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                     return params;
                 }
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    HashMap<String, String> headers = new HashMap<>();
-                    headers.put("Content-Type", "application/json");
-                    return headers;
-                }
-
             };
             AppController.getInstance().addToRequestQueue(strReq, tag_json_obj);
         }

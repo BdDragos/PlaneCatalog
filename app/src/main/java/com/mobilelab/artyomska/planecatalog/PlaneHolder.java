@@ -143,7 +143,7 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
         pDialog.show();
 
         String tag_json_obj = "json_obj_req";
-        String url = "http://DESKTOP-28CNHAN//InventoryManagement/api/plane/DeletePlane";
+        String url = "http://DESKTOP-28CNHAN:8090//InventoryManagement/api/plane/DeletePlane";
         StringRequest strReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
@@ -151,13 +151,13 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
                 if (response.compareTo("true") == 0)
                 {
                     Snackbar snackbar2 = Snackbar.make(v, "Element was deleted", Snackbar.LENGTH_SHORT).setDuration(2000);
-                    pDialog.hide();
+                    pDialog.dismiss();
                     adapter.onRemoveItem(getAdapterPosition());
                     snackbar2.show();
                 }
                 else
                 {
-                    pDialog.hide();
+                    pDialog.dismiss();
                     AlertDialog alertDialog = new AlertDialog.Builder(context).create();
                     alertDialog.setTitle("Can't delete");
                     alertDialog.setMessage("Internet connection error");
@@ -176,7 +176,7 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
             public void onErrorResponse(VolleyError error)
             {
                 Log.e("ERROR", "Error occurred ", error);
-                pDialog.hide();
+                pDialog.dismiss();
             }
         })
         {
@@ -193,13 +193,6 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
                 params.put("wikiLink", plane.getWikiLink());
 
                 return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                return headers;
             }
 
         };

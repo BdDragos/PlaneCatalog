@@ -13,7 +13,7 @@ import java.util.List;
 
 public class MainService
 {
-    PlaneRepository repo;
+    private PlaneRepository repo;
 
     public MainService(Context dbContext)
     {

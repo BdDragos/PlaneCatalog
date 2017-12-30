@@ -75,4 +75,12 @@ public class PlaneAdapter extends RecyclerView.Adapter<PlaneHolder> {
         planes = newList;
         notifyDataSetChanged();
     }
+
+    public void addNewDataPage(ArrayList<Plane> data)
+    {
+        final int size = planes.size() + 1;
+        planes.addAll(data);
+        notifyItemRangeInserted(size, data.size());
+    }
+
 }

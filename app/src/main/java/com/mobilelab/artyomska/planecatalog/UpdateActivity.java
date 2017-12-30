@@ -136,7 +136,7 @@ public class UpdateActivity extends AppCompatActivity {
         pDialog.show();
 
         String tag_json_obj = "json_obj_req";
-        String url = "http://DESKTOP-28CNHAN//InventoryManagement/api/plane/UpdatePlane";
+        String url = "http://DESKTOP-28CNHAN:8090//InventoryManagement/api/plane/UpdatePlane";
         StringRequest strReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
@@ -178,7 +178,7 @@ public class UpdateActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error)
             {
                 Log.e("ERROR", "Error occurred ", error);
-                pDialog.hide();
+                pDialog.dismiss();
             }
         })
         {
@@ -197,12 +197,6 @@ public class UpdateActivity extends AppCompatActivity {
                 return params;
             }
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                return headers;
-            }
 
         };
         AppController.getInstance().addToRequestQueue(strReq, tag_json_obj);

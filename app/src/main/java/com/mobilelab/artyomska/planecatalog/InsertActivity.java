@@ -117,7 +117,7 @@ public class InsertActivity extends AppCompatActivity {
         pDialog.show();
 
         String tag_json_obj = "json_obj_req";
-        String url = "http://DESKTOP-28CNHAN//InventoryManagement/api/plane/AddPlane";
+        String url = "http://DESKTOP-28CNHAN:8090//InventoryManagement/api/plane/AddPlane";
         StringRequest strReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
@@ -175,13 +175,6 @@ public class InsertActivity extends AppCompatActivity {
                 params.put("wikiLink", plane.getWikiLink());
 
                 return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                return headers;
             }
 
         };
