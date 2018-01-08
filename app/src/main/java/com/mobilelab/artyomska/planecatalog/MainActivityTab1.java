@@ -1,6 +1,9 @@
 package com.mobilelab.artyomska.planecatalog;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -23,50 +28,71 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class MainActivityTab1 extends Fragment {
 
     private MainService service;
-    private RecyclerView planeList;
     private PlaneAdapter adapter;
-    private EndlessRecyclerViewScrollListener scrollListener;
-    private CheckNetwork network;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         MainActivity activity = (MainActivity) getActivity();
 
-        this.adapter = activity.getAdapter();
         this.service = activity.getService();
-        this.network = new CheckNetwork(activity);
 
         View RootView = inflater.inflate(R.layout.tab1, container, false);
 
-        planeList = RootView.findViewById(R.id.planeList);
+        RecyclerView planeList = RootView.findViewById(R.id.planeList);
+
         LinearLayoutManager llm = new LinearLayoutManager(activity);
         planeList.setLayoutManager(llm);
 
-        scrollListener = new EndlessRecyclerViewScrollListener(llm) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                getPlanesFromServer(page);
-            }
-        };
+        EndlessRecyclerViewScrollListener scrollListener;
+        if (CheckNetwork.isNetworkConnected(getActivity()))
+            scrollListener = new EndlessRecyclerViewScrollListener(llm) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                    getPlanesFromServer(page);
+                }
+            };
+        else
+            scrollListener = new EndlessRecyclerViewScrollListener(llm) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                    getPlanesFromLocalDatabase(page);
+                }
+            };
 
-        planeList.addOnScrollListener(scrollListener);
+        adapter = new PlaneAdapter(activity, R.layout.listview_row, service,scrollListener);
         planeList.setAdapter(adapter);
-
-        getPlanesFromServer(1);
+        planeList.addOnScrollListener(scrollListener);
+        scrollListener.resetState();
+        if (CheckNetwork.isNetworkConnected(getActivity()))
+            getPlanesFromServer(0);
+        else
+            getPlanesFromLocalDatabase(0);
 
 
         return RootView;
+
     }
 
-    private void getPlanesFromLocalDatabase()
+    private void getPlanesFromLocalDatabase(int page)
     {
+        List<Plane> planes = service.gettAllPlane();
+        ArrayList<Plane> fin = new ArrayList<>();
+        List<Object> result = planes.stream().skip(page  * 5).limit(5).collect(Collectors.toList());
+        for (Object x : result)
+        {
+            fin.add((Plane)x);
+        }
+        adapter.addNewDataPage(fin);
 
     }
 
@@ -77,7 +103,6 @@ public class MainActivityTab1 extends Fragment {
                 page,
                 5,
                 5);
-        String url = "http://DESKTOP-28CNHAN:8090//InventoryManagement/api/plane/all";
 
         JsonArrayRequest jsonObjReq = new JsonArrayRequest(Request.Method.GET, uri, null, new Response.Listener<JSONArray>()
         {
@@ -154,9 +179,29 @@ public class MainActivityTab1 extends Fragment {
             {
                 Log.e("ERROR", "Error occurred ", error);
             }
-        });
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                SharedPreferences settings = PreferenceManager
+                        .getDefaultSharedPreferences(getActivity());
+                String auth_token_string = settings.getString("token", "");
 
+                Map<String, String> params = new HashMap<>();
+                params.put("Content-Type", "application/json; charset=UTF-8");
+                params.put("Authorization", "Basic " + auth_token_string);
+                return params;
+            }
+        };
+
+        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppController.getInstance().addToRequestQueue(jsonObjReq, tag_json_obj);
     }
 
+    public void onIorU()
+    {
+        adapter.onIorUItem();
+    }
 }

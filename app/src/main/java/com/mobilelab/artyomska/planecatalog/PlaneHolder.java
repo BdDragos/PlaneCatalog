@@ -6,7 +6,9 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -25,6 +28,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.service.MainService;
+import com.mobilelab.artyomska.planecatalog.utils.CheckNetwork;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -97,7 +101,10 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
 
                             case R.id.deletePlane:
 
-                                deletePlane(plane,v);
+                                if (CheckNetwork.isNetworkConnected(context))
+                                    deletePlane(plane,v);
+                                else
+                                    deletePlaneOffline(plane,v);
                                 break;
 
                             case R.id.insertPlane:
@@ -136,6 +143,15 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
         }
     }
 
+    public void deletePlaneOffline(final Plane plane,final View v)
+    {
+        service.deletePlane(plane.getPlaneName());
+        Snackbar snackbar2 = Snackbar.make(v, "Element was deleted", Snackbar.LENGTH_SHORT).setDuration(2000);
+        adapter.onRemoveItem(getAdapterPosition());
+        snackbar2.show();
+    }
+
+
     public void deletePlane(final Plane plane,final View v)
     {
         final ProgressDialog pDialog = new ProgressDialog(context);
@@ -143,7 +159,7 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
         pDialog.show();
 
         String tag_json_obj = "json_obj_req";
-        String url = "http://DESKTOP-28CNHAN:8090//InventoryManagement/api/plane/DeletePlane";
+        String url = "http:/DESKTOP-28CNHAN:8090/InventoryManagement/api/plane/DeletePlane";
         StringRequest strReq = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response)
@@ -160,7 +176,7 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
                     pDialog.dismiss();
                     AlertDialog alertDialog = new AlertDialog.Builder(context).create();
                     alertDialog.setTitle("Can't delete");
-                    alertDialog.setMessage("Internet connection error");
+                    alertDialog.setMessage("Plane doesn't exist");
                     alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
@@ -176,26 +192,38 @@ public class PlaneHolder extends RecyclerView.ViewHolder implements View.OnClick
             public void onErrorResponse(VolleyError error)
             {
                 Log.e("ERROR", "Error occurred ", error);
+                Snackbar snackbar2 = Snackbar.make(v, "Element couldn't be deleted. Server error", Snackbar.LENGTH_SHORT).setDuration(2000);
+                snackbar2.show();
                 pDialog.dismiss();
             }
         })
         {
             @Override
+            public Map<String, String> getHeaders() throws AuthFailureError
+            {
+                SharedPreferences settings = PreferenceManager
+                        .getDefaultSharedPreferences(context);
+                String auth_token_string = settings.getString("token", "");
+
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "Basic " + auth_token_string);
+                return params;
+            }
+
+            @Override
             protected Map<String,String> getParams()
             {
                 Map<String, String> params = new HashMap<>();
-                params.put("ID",Integer.toString(plane.getID()));
-                params.put("planeName", plane.getPlaneName());
-                params.put("planeEngine", plane.getPlaneEngine());
-                params.put("planeProducer", plane.getPlaneCountry());
-                params.put("planeCountry", plane.getPlaneProducer());
-                params.put("planeYear", Integer.toString(plane.getPlaneYear()));
-                params.put("wikiLink", plane.getWikiLink());
+                params.put("ID",String.valueOf(plane.getID()));
 
                 return params;
             }
 
         };
+        strReq.setRetryPolicy(new DefaultRetryPolicy(
+                10000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppController.getInstance().addToRequestQueue(strReq, tag_json_obj);
     }
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.service.MainService;
+import com.mobilelab.artyomska.planecatalog.utils.EndlessRecyclerViewScrollListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,19 +23,16 @@ public class PlaneAdapter extends RecyclerView.Adapter<PlaneHolder> {
     private Context context;
     private int itemResource;
     private MainService service;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
-    public PlaneAdapter()
-    {
-
-    }
-
-    public PlaneAdapter(Context context, int itemResource, ArrayList<Plane> planes, MainService service) {
+    public PlaneAdapter(Context context, int itemResource, MainService service, EndlessRecyclerViewScrollListener scrollListener) {
 
         // 1. Initialize our adapter
-        this.planes = planes;
         this.context = context;
         this.itemResource = itemResource;
         this.service = service;
+        this.scrollListener = scrollListener;
+        this.planes = new ArrayList<>();
     }
 
     // 2. Override the onCreateViewHolder method
@@ -70,10 +68,8 @@ public class PlaneAdapter extends RecyclerView.Adapter<PlaneHolder> {
 
     public void onIorUItem()
     {
-        ArrayList<Plane> newList = new ArrayList<>(service.gettAllPlane());
-        planes.clear();
-        planes = newList;
         notifyDataSetChanged();
+        scrollListener.resetState();
     }
 
     public void addNewDataPage(ArrayList<Plane> data)

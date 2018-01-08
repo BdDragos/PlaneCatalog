@@ -1,8 +1,12 @@
 package com.mobilelab.artyomska.planecatalog;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,19 +16,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.mobilelab.artyomska.planecatalog.model.Plane;
 import com.mobilelab.artyomska.planecatalog.model.User;
-import com.mobilelab.artyomska.planecatalog.repository.PlaneRepository;
 import com.mobilelab.artyomska.planecatalog.service.LoginService;
 import com.mobilelab.artyomska.planecatalog.utils.CheckNetwork;
-
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,30 +32,36 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText name;
     private EditText password;
-    private Button loginButton;
-    private Button registerButton;
-    private TextView attemptsText;
-    private CheckNetwork network;
     private LoginService service;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+        boolean hasLoggedIn = settings.getBoolean("hasLoggedIn", false);
+
+        if(hasLoggedIn)
+        {
+            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         name = findViewById(R.id.userInput);
         password = findViewById(R.id.passwordInput);
-        loginButton = findViewById(R.id.loginButton);
-        attemptsText = findViewById(R.id.attemptsText);
-        registerButton = findViewById(R.id.registerBut);
+        Button loginButton = findViewById(R.id.loginButton);
+        TextView attemptsText = findViewById(R.id.attemptsText);
+        Button registerButton = findViewById(R.id.registerBut);
 
         attemptsText.setText("No of attempts remaining: 5");
 
-        network = new CheckNetwork(this);
         service = new LoginService(this);
 
-        if (network.isNetworkConnected())
+        if (CheckNetwork.isNetworkConnected(this))
         {
             loginButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -130,9 +135,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response)
             {
-                if (response.compareTo("true") == 0)
+                if (response.compareTo("false") != 0)
                 {
                     pDialog.dismiss();
+                    SharedPreferences settings = PreferenceManager
+                            .getDefaultSharedPreferences(LoginActivity.this);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString("token", response);
+                    editor.putBoolean("hasLoggedIn", true);
+                    editor.apply();
                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
                     startActivity(intent);
                     finish();
@@ -158,7 +169,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error)
             {
                 Log.e("ERROR", "Error occurred ", error);
+                Snackbar snackbar2 = Snackbar.make(getWindow().getDecorView().getRootView(), "Server error", Snackbar.LENGTH_SHORT).setDuration(2000);
                 pDialog.dismiss();
+                snackbar2.show();
             }
         })
         {
@@ -169,11 +182,9 @@ public class LoginActivity extends AppCompatActivity {
                 params.put("username", userName);
                 params.put("password", userPassword);
 
+
                 return params;
             }
-
-
-
         };
         strReq.setRetryPolicy(new DefaultRetryPolicy(
                 10000,

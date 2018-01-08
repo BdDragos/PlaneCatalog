@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="Logout"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/sync"
+        android:orderInCategory="100"
+        android:title="SyncWithDatabase"
+        app:showAsAction="never" />
 </menu>
